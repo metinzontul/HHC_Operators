@@ -376,23 +376,94 @@ if SAVE_FIGURES:
 # ------------------------------------------------------------
 # Figure 4: 3D error surfaces
 # ------------------------------------------------------------
-fig = plt.figure(figsize=(15, 4.5))
-for idx, (mat, cl, ttl) in enumerate([
+
+fig = plt.figure(figsize=(20, 6))
+fig.patch.set_facecolor("white")
+
+plot_data = [
     (ErrC, "Reds",   rf"$|C_{{{n_show}}}^s(f)-f|$"),
     (ErrK, "Blues",  rf"$|K_{{{n_show}}}^s(f)-f|$"),
     (ErrQ, "Greens", rf"$|Q_{{{n_show}}}^s(f)-f|$")
-]):
-    ax = fig.add_subplot(1, 3, idx + 1, projection="3d")
-    ax.plot_surface(U1, U2, mat, cmap=cl, linewidth=0, antialiased=True)
-    ax.set_title(ttl)
-    ax.set_xlabel(r"$u_1$")
-    ax.set_ylabel(r"$u_2$")
-    ax.set_zlabel("error")
+]
 
-plt.tight_layout()
+for i, (Err, cmap_name, title) in enumerate(plot_data, start=1):
+
+    ax = fig.add_subplot(1, 3, i, projection="3d")
+
+    ax.plot_surface(
+        U1, U2, Err,
+        cmap=cmap_name,
+        linewidth=0,
+        antialiased=True,
+        shade=True
+    )
+
+    # Titles
+    ax.set_title(title, fontsize=18, pad=18)
+
+    # Axis labels
+    ax.set_xlabel(r"$u_1$", fontsize=16, labelpad=12)
+    ax.set_ylabel(r"$u_2$", fontsize=16, labelpad=12)
+
+    # We avoid zlabel because it may be cut in the third plot
+    ax.set_zlabel("")
+
+    # Stable and visible Error label
+    ax.text2D(
+        0.03, 0.82,
+        "Error",
+        transform=ax.transAxes,
+        fontsize=18
+    )
+
+    # Tick positions similar to the attached figure
+    ax.set_xticks([-0.6, 0.0, 0.6])
+    ax.set_yticks([-0.6, 0.0, 0.6])
+
+    # z-axis ticks adjusted automatically according to each error surface
+    zmax = np.max(Err)
+
+    if zmax <= 0.07:
+        ax.set_zticks([0.00, 0.02, 0.04, 0.06])
+    elif zmax <= 0.19:
+        ax.set_zticks([0.00, 0.05, 0.10, 0.15])
+    else:
+        ax.set_zticks([0.00, 0.05, 0.10, 0.15, 0.20])
+
+
+    # Tick appearance
+    ax.tick_params(axis="x", labelsize=13, pad=3)
+    ax.tick_params(axis="y", labelsize=13, pad=3)
+    ax.tick_params(axis="z", labelsize=13, pad=5)
+
+    # View angle close to your attached figure
+    ax.view_init(elev=25, azim=-55)
+
+    # Balanced 3D proportions
+    ax.set_box_aspect((1.35, 1.35, 0.80))
+
+    # Grid
+    ax.grid(True)
+
+# Horizontal spacing between the three panels
+plt.subplots_adjust(
+    left=0.02,
+    right=0.98,
+    bottom=0.05,
+    top=0.90,
+    wspace=0.20
+)
+
+# Save high-resolution figure
 if SAVE_FIGURES:
-    plt.savefig("Figure4.png", dpi=600, bbox_inches="tight")
+    plt.savefig(
+        "Figure3_3d_surfaces_600_dpi.png",
+        dpi=600,
+        bbox_inches="tight",
+        pad_inches=0.25
+    )
 
+plt.show()
 # ------------------------------------------------------------
 # Figure 5: Cake-slice view
 # ------------------------------------------------------------
